@@ -1,0 +1,1460 @@
+import React, { useState, useMemo } from 'react';
+import {
+  ShoppingBag,
+  Store,
+  Download,
+  Search,
+  PlusCircle,
+  CheckCircle2,
+  Star,
+  CreditCard,
+  Smartphone,
+  ShieldCheck,
+  TrendingUp,
+  Package,
+  Wallet,
+  Copy,
+  Check,
+  X,
+  FileText,
+  Sparkles,
+  UserCheck,
+  ArrowUpRight,
+  Filter,
+  Eye,
+  Lock,
+  Upload,
+  HelpCircle,
+  BookOpen,
+  Code,
+  Gamepad2,
+  Palette,
+  Video,
+  Award,
+  Trash2
+} from 'lucide-react';
+
+// بيانات أولية للمنتجات الرقمية في السوق الجزائري
+const INITIAL_PRODUCTS = [
+  {
+    id: 'prod-1',
+    title: 'حزمة قوالب سوشيال ميديا احترافية للتجارة الإلكترونية في الجزائر',
+    category: 'تصاميم وقوالب',
+    price: 2500,
+    rating: 4.9,
+    sales: 142,
+    sellerName: 'أمين ديزاين - الجزائر',
+    sellerVerified: true,
+    sellerRip: '00799999002458741236',
+    sellerRedotId: '158974236',
+    description: 'أكثر من 150 قالب كانفا وفوتوشوب جاهز للتعديل باللهجة الجزائرية والعربية الفصحى لزيادة مبيعات متجرك الإلكتروني.',
+    fileSize: '450 MB',
+    fileFormat: 'PSD + Canva Links (PDF)',
+    downloadUrl: 'https://oneclick.dz/dl/social-templates-pack-dz.zip',
+    badge: 'الأكثر مبيعاً',
+    iconType: 'palette',
+    gradient: 'from-emerald-600 to-teal-800'
+  },
+  {
+    id: 'prod-2',
+    title: 'الدورة الشاملة لإطلاق متجر شوبيفاي والدفع عند الاستلام في الجزائر',
+    category: 'دورات تدريبية',
+    price: 6800,
+    rating: 4.8,
+    sales: 89,
+    sellerName: 'أكاديمية التجارة الرقمية DZ',
+    sellerVerified: true,
+    sellerRip: '00799999008854123698',
+    sellerRedotId: '985412367',
+    description: 'دورة عملية مصورة خطوة بخطوة من الصفر حتى تحقيق أول 100 طلبية مع ربط شركات التوصيل (ياليدين، زاد إكسبريس) وإعلانات فيسبوك.',
+    fileSize: '4.2 GB',
+    fileFormat: 'MP4 Videos + PDF Guides',
+    downloadUrl: 'https://oneclick.dz/dl/dz-ecommerce-masterclass.zip',
+    badge: 'دورة مميزة',
+    iconType: 'video',
+    gradient: 'from-indigo-600 to-blue-900'
+  },
+  {
+    id: 'prod-3',
+    title: 'بطاقة شحن شدات ببجي & فري فاير + كود ستيم (تسليم فوري)',
+    category: 'بطاقات وألعاب',
+    price: 3200,
+    rating: 5.0,
+    sales: 310,
+    sellerName: 'جيمر ستور وهران',
+    sellerVerified: true,
+    sellerRip: '00799999001122334455',
+    sellerRedotId: '445566778',
+    description: 'كود رقمي أصلي ومضمون 100% يتم تحميله مباشرة بعد تأكيد الدفع عبر بريدي موب أو ريدوت باي مع شرح طريقة التفعيل.',
+    fileSize: '2 MB',
+    fileFormat: 'Digital Code (TXT/PDF)',
+    downloadUrl: 'https://oneclick.dz/dl/game-voucher-code-dz.txt',
+    badge: 'تسليم فوري',
+    iconType: 'gamepad',
+    gradient: 'from-purple-600 to-indigo-900'
+  },
+  {
+    id: 'prod-4',
+    title: 'سكريبت متجر إلكتروني جزائري متكامل يدعم 58 ولاية (React & Node)',
+    category: 'برمجيات وأكواد',
+    price: 9500,
+    rating: 4.9,
+    sales: 64,
+    sellerName: 'كود ديزاد - قسنطينة',
+    sellerVerified: true,
+    sellerRip: '00799999007788996655',
+    sellerRedotId: '332211445',
+    description: 'كود سورس كامل لمتجر إلكتروني سريع جداً، يحتوي على أسعار التوصيل لـ 58 ولاية جزائرية، пиксеلات فيسبوك وتيك توك، ولوحة تحكم سهلة.',
+    fileSize: '125 MB',
+    fileFormat: 'ZIP Source Code + Documentation',
+    downloadUrl: 'https://oneclick.dz/dl/dz-store-script-v3.zip',
+    badge: 'احترافي',
+    iconType: 'code',
+    gradient: 'from-slate-700 to-slate-900'
+  },
+  {
+    id: 'prod-5',
+    title: 'كتاب رقمي: دليل العمل الحر وتحصيل الأموال بالعملة الصعبة في الجزائر',
+    category: 'كتب رقمية',
+    price: 1500,
+    rating: 4.7,
+    sales: 215,
+    sellerName: 'سارة فريلانس',
+    sellerVerified: true,
+    sellerRip: '00799999005544332211',
+    sellerRedotId: '778899112',
+    description: 'دليل شامل يشرح فتح حسابات البنوك الإلكترونية (RedotPay, Paysera, Wise) وكيفية التعامل مع الزبائن وبيع خدماتك من الجزائر.',
+    fileSize: '18 MB',
+    fileFormat: 'PDF الكتاب + ملاحق',
+    downloadUrl: 'https://oneclick.dz/dl/freelance-algeria-guide.pdf',
+    badge: 'سعر اقتصادي',
+    iconType: 'book',
+    gradient: 'from-amber-600 to-orange-800'
+  },
+  {
+    id: 'prod-6',
+    title: 'قالب تسيير المحلات والمخزون والفواتير بالدينار الجزائري (Excel Pro)',
+    category: 'برمجيات وأكواد',
+    price: 1800,
+    rating: 4.8,
+    sales: 178,
+    sellerName: 'محاسبة ديزاد',
+    sellerVerified: false,
+    sellerRip: '00799999006655443322',
+    sellerRedotId: '665544332',
+    description: 'نظام محاسبي متكامل على إكسل لحساب الأرباح، الديون، المخزون، وطباعة وصولات البيع بالدينار الجزائري بكل سهولة.',
+    fileSize: '12 MB',
+    fileFormat: 'XLSX Macro Enabled',
+    downloadUrl: 'https://oneclick.dz/dl/dz-accounting-excel.xlsx',
+    badge: 'عملي جداً',
+    iconType: 'file',
+    gradient: 'from-cyan-600 to-teal-900'
+  }
+];
+
+const CATEGORIES = [
+  'الكل',
+  'تصاميم وقوالب',
+  'دورات تدريبية',
+  'برمجيات وأكواد',
+  'بطاقات وألعاب',
+  'كتب رقمية'
+];
+
+export default function App() {
+  // الحالة الرئيسية للتنقل بين التبويبات
+  const [activeTab, setActiveTab] = useState('marketplace'); // 'marketplace' | 'seller' | 'purchases'
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [selectedCategory, setSelectedCategory] = useState('الكل');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // حالة سلة المشتريات والمنتجات المشتراة
+  const [purchasedItems, setPurchasedItems] = useState([
+    {
+      ...INITIAL_PRODUCTS[4],
+      purchaseDate: '2025-02-15',
+      paymentMethod: 'بريدي موب (BaridiMob)',
+      transactionRef: 'BM-88451239'
+    }
+  ]);
+
+  // حالة نافذة الدفع (Checkout Modal)
+  const [checkoutProduct, setCheckoutProduct] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('baridimob'); // 'baridimob' | 'redotpay'
+  const [transactionId, setTransactionId] = useState('');
+  const [buyerPhone, setBuyerPhone] = useState('');
+  const [receiptFileName, setReceiptFileName] = useState('');
+  const [copiedText, setCopiedText] = useState('');
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+
+  // حالة نافذة معاينة تفاصيل المنتج
+  const [previewProduct, setPreviewProduct] = useState(null);
+
+  // حالة إشعارات النظام (Toast)
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // حالة نموذج البائع لإضافة منتج جديد
+  const [sellerInfo, setSellerInfo] = useState({
+    storeName: 'متجري الرقمي DZ',
+    rip: '00799999001234567890',
+    redotId: '852963741'
+  });
+
+  const [newProduct, setNewProduct] = useState({
+    title: '',
+    category: 'تصاميم وقوالب',
+    price: '',
+    description: '',
+    fileFormat: 'ZIP / PDF',
+    fileSize: '25 MB',
+    downloadUrl: ''
+  });
+
+  // دالة إظهار إشعار سريع
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3800);
+  };
+
+  // دالة نسخ النصوص (RIP أو RedotPay ID)
+  const handleCopy = (text, label) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedText(label);
+    setTimeout(() => setCopiedText(''), 2000);
+  };
+
+  // تصفية المنتجات حسب البحث والتصنيف
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesCategory =
+        selectedCategory === 'الكل' || product.category === selectedCategory;
+      const matchesSearch =
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, selectedCategory, searchQuery]);
+
+  // منتجات البائع الحالي
+  const mySellerProducts = useMemo(() => {
+    return products.filter((p) => p.isMyProduct || p.sellerName === sellerInfo.storeName);
+  }, [products, sellerInfo.storeName]);
+
+  // إحصائيات البائع
+  const sellerStats = useMemo(() => {
+    const customSales = mySellerProducts.reduce((acc, item) => acc + item.price * item.sales, 0);
+    const baseBalance = 48500; // رصيد افتراضي للعرض التوضيحي
+    return {
+      totalBalance: baseBalance + customSales,
+      totalSalesCount: 34 + mySellerProducts.reduce((acc, item) => acc + item.sales, 0),
+      activeProductsCount: mySellerProducts.length + 2
+    };
+  }, [mySellerProducts]);
+
+  // فتح نافذة الشراء
+  const openCheckout = (product) => {
+    setCheckoutProduct(product);
+    setPaymentMethod('baridimob');
+    setTransactionId('');
+    setBuyerPhone('');
+    setReceiptFileName('');
+    setCheckoutSuccess(false);
+    setPaymentError('');
+  };
+
+  // إتمام عملية الدفع عبر بريدي موب أو ريدوت باي
+  const handleConfirmPayment = (e) => {
+    e.preventDefault();
+    if (!transactionId.trim() || transactionId.trim().length < 4) {
+      setPaymentError('يرجى إدخال رقم عملية التحويل (رقم الوصل أو المعرف) لتأكيد الدفع.');
+      return;
+    }
+
+    setPaymentError('');
+    const newPurchase = {
+      ...checkoutProduct,
+      purchaseDate: new Date().toISOString().split('T')[0],
+      paymentMethod:
+        paymentMethod === 'baridimob'
+          ? 'بريدي موب (BaridiMob)'
+          : 'ريدوت باي (RedotPay)',
+      transactionRef: transactionId.toUpperCase()
+    };
+
+    // تحديث عدد المبيعات للمنتج
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === checkoutProduct.id ? { ...p, sales: p.sales + 1 } : p
+      )
+    );
+
+    setPurchasedItems((prev) => [newPurchase, ...prev]);
+    setCheckoutSuccess(true);
+    showToast(`تم شراء "${checkoutProduct.title}" بنجاح! يمكنك تحميله الآن.`);
+  };
+
+  // إضافة منتج رقمي جديد من لوحة البائع
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    if (!newProduct.title.trim() || !newProduct.price || Number(newProduct.price) <= 0) {
+      showToast('يرجى ملء عنوان المنتج والسعر بالدينار الجزائري بشكل صحيح.');
+      return;
+    }
+
+    const createdProduct = {
+      id: `prod-${Date.now()}`,
+      title: newProduct.title,
+      category: newProduct.category,
+      price: Number(newProduct.price),
+      rating: 5.0,
+      sales: 1,
+      sellerName: sellerInfo.storeName || 'بائع معتمد DZ',
+      sellerVerified: true,
+      sellerRip: sellerInfo.rip,
+      sellerRedotId: sellerInfo.redotId,
+      description:
+        newProduct.description ||
+        'منتج رقمي جزائري عالي الجودة متاح للتحميل الفوري بعد الدفع عبر بريدي موب أو ريدوت باي.',
+      fileSize: newProduct.fileSize || '15 MB',
+      fileFormat: newProduct.fileFormat || 'ZIP / PDF',
+      downloadUrl: newProduct.downloadUrl || 'https://oneclick.dz/dl/custom-product.zip',
+      badge: 'جديد',
+      iconType: 'sparkles',
+      gradient: 'from-emerald-600 to-cyan-800',
+      isMyProduct: true
+    };
+
+    setProducts((prev) => [createdProduct, ...prev]);
+    setNewProduct({
+      title: '',
+      category: 'تصاميم وقوالب',
+      price: '',
+      description: '',
+      fileFormat: 'ZIP / PDF',
+      fileSize: '25 MB',
+      downloadUrl: ''
+    });
+
+    showToast('تم نشر منتجك الرقمي في سوق "وان كليك" بنجاح!');
+  };
+
+  // حذف منتج خاص بالبائع
+  const handleDeleteProduct = (id) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+    showToast('تم حذف المنتج من متجرك بنجاح.');
+  };
+
+  // محاكاة تحميل الملف الرقمي
+  const triggerDigitalDownload = (item) => {
+    const content = `========================================
+منصة وان كليك الجزائرية للمنتجات الرقمية (OneClick DZ)
+========================================
+شكراً لشرائك من منصتنا!
+
+اسم المنتج: ${item.title}
+البائع: ${item.sellerName}
+السعر المدفوع: ${item.price.toLocaleString('ar-DZ')} د.ج
+طريقة الدفع: ${item.paymentMethod || 'فوري'}
+رقم المرجع: ${item.transactionRef || 'OC-DZ-9981'}
+----------------------------------------
+رابط التحميل المباشر للملف الأصلي الكامل:
+${item.downloadUrl}
+
+ملاحظة: هذا الملف محمي ومخصص للمشتري فقط.
+نتمنى لك تجربة موفقة!
+OneClick Algeria - سوق المنتجات الرقمية الأول في الجزائر
+`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `OneClick-DZ-${item.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('بدأ تحميل ملف المنتج الرقمي على جهازك!');
+  };
+
+  // أيقونة كل منتج حسب نوعه
+  const renderProductIcon = (type) => {
+    switch (type) {
+      case 'palette':
+        return <Palette className="w-10 h-10 text-white/90" />;
+      case 'video':
+        return <Video className="w-10 h-10 text-white/90" />;
+      case 'gamepad':
+        return <Gamepad2 className="w-10 h-10 text-white/90" />;
+      case 'code':
+        return <Code className="w-10 h-10 text-white/90" />;
+      case 'book':
+        return <BookOpen className="w-10 h-10 text-white/90" />;
+      default:
+        return <Sparkles className="w-10 h-10 text-white/90" />;
+    }
+  };
+
+  // حساب سعر المنتج بالدولار الرقمي USDT لريدوت باي (سعر صرف تقريبي للسوق الموازي 1 USDT = 250 DZD)
+  const convertDzdToUsdt = (dzd) => {
+    return (dzd / 250).toFixed(2);
+  };
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-white">
+      {/* إشعار عائم (Toast) */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3 bg-emerald-600 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-emerald-400/30 animate-bounce">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span className="text-sm font-bold">{toastMessage}</span>
+        </div>
+      )}
+
+      {/* شريط علوي ترويجي */}
+      <div className="bg-gradient-to-l from-emerald-900/80 via-slate-900 to-amber-900/60 border-b border-slate-800/80 py-2 px-4 text-center text-xs sm:text-sm text-emerald-200 flex flex-wrap items-center justify-center gap-2">
+        <span className="inline-flex items-center gap-1 font-bold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+          🇩🇿 منصة جزائرية 100%
+        </span>
+        <span>بيع واشترِ المنتجات الرقمية بالدينار الجزائري بكل أمان عبر</span>
+        <span className="font-bold text-amber-300">بريدي موب (BaridiMob)</span>
+        <span>و</span>
+        <span className="font-bold text-rose-400">ريدوت باي (RedotPay)</span>
+      </div>
+
+      {/* الهيدر الرئيسي (Navbar) */}
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/85 border-b border-slate-800/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+          {/* الشعار */}
+          <div 
+            onClick={() => setActiveTab('marketplace')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-600/25 group-hover:scale-105 transition-transform">
+              <ShoppingBag className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-black tracking-tight bg-gradient-to-l from-white via-emerald-200 to-emerald-400 bg-clip-text text-transparent">
+                  وان كليك
+                </h1>
+                <span className="text-xs font-extrabold uppercase tracking-wider px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md">
+                  OneClick DZ
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 hidden sm:block">
+                السوق الجزائري المفتوح للمنتجات الرقمية
+              </p>
+            </div>
+          </div>
+
+          {/* أزرار التنقل بين الأقسام */}
+          <nav className="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+            <button
+              onClick={() => setActiveTab('marketplace')}
+              className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'marketplace'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>السوق الرقمي</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('seller')}
+              className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'seller'
+                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Store className="w-4 h-4" />
+              <span>بيع منتجاتك</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('purchases')}
+              className={`relative flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'purchases'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Download className="w-4 h-4" />
+              <span>مشترياتي</span>
+              {purchasedItems.length > 0 && (
+                <span className="px-1.5 py-0.2 bg-emerald-400 text-slate-950 rounded-full text-[11px] font-black">
+                  {purchasedItems.length}
+                </span>
+              )}
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* المحتوى الرئيسي حسب التبويب المختار */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* ================= 1. تبويب السوق الرقمي (MARKETPLACE) ================= */}
+        {activeTab === 'marketplace' && (
+          <div className="space-y-10">
+            {/* قسم الهيرو (Hero Banner) */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-emerald-950/60 to-slate-900 border border-emerald-500/20 p-6 sm:p-10 lg:p-12 shadow-2xl">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7 space-y-5">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs sm:text-sm font-semibold">
+                    <Sparkles className="w-4 h-4" />
+                    <span>منصة مفتوحة للجميع - بيع واشترِ بضغطة زر واحدة</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-5xl font-black leading-tight text-white">
+                    سوق <span className="text-emerald-400">وان كليك</span> للمنتجات الرقمية في الجزائر
+                  </h2>
+                  <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    سواء كنت مصمماً، مبرمجاً، صانع محتوى أو تبحث عن قوالب، دورات تدريبية، كتب وأكواد جاهزة.. اشتري فوراً بالدينار الجزائري أو افتح حساب بائع مجاناً واستقبل أرباحك مباشرة على <strong className="text-amber-300">بريدي موب</strong> أو <strong className="text-rose-400">ريدوت باي</strong>!
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4 pt-2">
+                    <button
+                      onClick={() => setActiveTab('seller')}
+                      className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3.5 rounded-2xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
+                    >
+                      <PlusCircle className="w-5 h-5" />
+                      <span>ابدأ البيع الآن مجاناً</span>
+                    </button>
+                    <div className="flex items-center gap-4 px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm">
+                      <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                        <Smartphone className="w-4 h-4" />
+                        <span>BaridiMob</span>
+                      </div>
+                      <span className="text-slate-700">|</span>
+                      <div className="flex items-center gap-1.5 text-rose-400 font-bold">
+                        <CreditCard className="w-4 h-4" />
+                        <span>RedotPay</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* بطاقة إحصائيات ومميزات المنصة */}
+                <div className="lg:col-span-5 grid grid-cols-2 gap-4">
+                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-5 rounded-2xl space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-white text-base">دفع ببريدي موب</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      تحويل مباشر عبر RIP / CCP بالدينار الجزائري مع توثيق فوري للوصل.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-5 rounded-2xl space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                      <CreditCard className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-white text-base">دعم ريدوت باي</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      ادفع أو استقبل أموالك عبر RedotPay ID بدون رسوم تحويل.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-5 rounded-2xl space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <Download className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-white text-base">تحميل فوري</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      احصل على ملفاتك وروابطك الرقمية في ثوانٍ بمجرد تأكيد العملية.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-5 rounded-2xl space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-white text-base">ضمان وان كليك</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      حماية كاملة للمشتري والبائع مع مراجعة جودة الملفات الرقمية.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* شريط البحث والتصنيفات */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 space-y-5">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                {/* حقل البحث */}
+                <div className="relative w-full md:w-96">
+                  <Search className="w-5 h-5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="ابحث عن قالب، دورة، كود، كتاب رقمي..."
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl pr-12 pl-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition-all"
+                  />
+                </div>
+
+                {/* عداد المنتجات */}
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-400">
+                  <Filter className="w-4 h-4 text-emerald-400" />
+                  <span>عرض</span>
+                  <strong className="text-white">{filteredProducts.length}</strong>
+                  <span>منتج رقمي جاهز للتحميل الفوري</span>
+                </div>
+              </div>
+
+              {/* أزرار التصنيفات */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {CATEGORIES.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+                      selectedCategory === category
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                        : 'bg-slate-950 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* شبكة المنتجات الرقمية */}
+            {filteredProducts.length === 0 ? (
+              <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-12 text-center space-y-4">
+                <Package className="w-12 h-12 text-slate-500 mx-auto" />
+                <h3 className="text-xl font-bold text-white">لم يتم العثور على منتجات مطابقة</h3>
+                <p className="text-slate-400 text-sm max-w-md mx-auto">
+                  جرب البحث بكلمات أخرى أو اختر تصنيفاً مختلفاً، أو كن أول من يضيف هذا المنتج في السوق!
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('الكل');
+                    setSearchQuery('');
+                  }}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold"
+                >
+                  عرض جميع المنتجات
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/50"
+                  >
+                    <div>
+                      {/* غلاف المنتج العلوي */}
+                      <div className={`relative h-44 bg-gradient-to-br ${product.gradient} p-6 flex flex-col justify-between`}>
+                        <div className="flex items-center justify-between">
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/40 backdrop-blur-md text-white border border-white/15">
+                            {product.category}
+                          </span>
+                          {product.badge && (
+                            <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 shadow-sm">
+                              {product.badge}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                            {renderProductIcon(product.iconType)}
+                          </div>
+                          <div className="text-left bg-black/35 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                            <span className="text-[11px] text-slate-300 block">صيغة الملف</span>
+                            <span className="text-xs font-bold text-emerald-300">{product.fileFormat}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* تفاصيل المنتج */}
+                      <div className="p-6 space-y-4">
+                        {/* معلومات البائع والتقييم */}
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+                            <UserCheck className="w-4 h-4 text-emerald-400" />
+                            <span>{product.sellerName}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg">
+                            <Star className="w-3.5 h-3.5 fill-amber-400" />
+                            <span>{product.rating}</span>
+                            <span className="text-slate-400 font-normal">({product.sales} مبيعة)</span>
+                          </div>
+                        </div>
+
+                        {/* العنوان والوصف */}
+                        <h3 className="text-lg font-extrabold text-white group-hover:text-emerald-400 transition-colors line-clamp-2">
+                          {product.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-400 line-clamp-2 leading-relaxed">
+                          {product.description}
+                        </p>
+
+                        {/* شارات وسائل الدفع المتاحة للبائع */}
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-[11px] px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">
+                            ✓ بريدي موب
+                          </span>
+                          <span className="text-[11px] px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-300 border border-rose-500/20 font-semibold">
+                            ✓ ريدوت باي
+                          </span>
+                          <span className="text-[11px] text-slate-500 mr-auto">
+                            الحجم: {product.fileSize}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* السعر وزر الشراء الفوري */}
+                    <div className="px-6 pb-6 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs text-slate-400 block">السعر النهائي</span>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl font-black text-emerald-400">
+                            {product.price.toLocaleString('ar-DZ')}
+                          </span>
+                          <span className="text-xs font-bold text-slate-300">د.ج</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setPreviewProduct(product)}
+                          title="معاينة التفاصيل"
+                          className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => openCheckout(product)}
+                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-xl shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
+                        >
+                          <span>شراء الآن</span>
+                          <ArrowUpRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================= 2. تبويب لوحة البائع (SELLER DASHBOARD) ================= */}
+        {activeTab === 'seller' && (
+          <div className="space-y-8">
+            {/* ترويسة لوحة البائع */}
+            <div className="bg-gradient-to-l from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 text-amber-400 text-xs font-bold bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                  <Store className="w-4 h-4" />
+                  <span>بوابة البائعين الجزائريين - OneClick Seller</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white">
+                  لوحة تحكم البائع وإضافة المنتجات الرقمية
+                </h2>
+                <p className="text-slate-400 text-sm max-w-2xl">
+                  انشر منتجاتك الرقمية مجاناً (كتب، قوالب، دورات، أكواد، بطاقات) واستقبل أرباحك بالدينار الجزائري مباشرة على حسابك في بريدي موب أو ريدوت باي.
+                </p>
+              </div>
+
+              {/* بطاقة الرصيد القابل للسحب */}
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 min-w-[260px] space-y-1">
+                <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                  <Wallet className="w-4 h-4 text-emerald-400" />
+                  إجمالي أرباحك في المنصة
+                </span>
+                <div className="text-3xl font-black text-emerald-400">
+                  {sellerStats.totalBalance.toLocaleString('ar-DZ')} <span className="text-sm text-white">د.ج</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  متاح للتحويل الفوري إلى BaridiMob أو RedotPay
+                </p>
+              </div>
+            </div>
+
+            {/* بطاقات إحصائيات سريعة */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400">إجمالي المبيعات</span>
+                  <p className="text-2xl font-black text-white mt-1">{sellerStats.totalSalesCount} مبيعة</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400">المنتجات المعروضة</span>
+                  <p className="text-2xl font-black text-white mt-1">{sellerStats.activeProductsCount} منتجات</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
+                  <Package className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400">تقييم المتجر</span>
+                  <p className="text-2xl font-black text-amber-400 mt-1">4.9 ★</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
+                  <Award className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* نموذج إضافة منتج رقمي جديد */}
+              <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <PlusCircle className="w-6 h-6 text-emerald-400" />
+                    <h3 className="text-xl font-extrabold text-white">إضافة منتج رقمي جديد للبيع</h3>
+                  </div>
+                  <span className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full font-semibold">
+                    نشر فوري
+                  </span>
+                </div>
+
+                <form onSubmit={handleAddProduct} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                      عنوان المنتج الرقمي *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newProduct.title}
+                      onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                      placeholder="مثال: دورة تصميم الإعلانات، قالب شوبيفاي جزائري، كتاب PDF..."
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                        التصنيف *
+                      </label>
+                      <select
+                        value={newProduct.category}
+                        onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                      >
+                        {CATEGORIES.filter((c) => c !== 'الكل').map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                        السعر بالدينار الجزائري (د.ج) *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min="100"
+                        step="50"
+                        value={newProduct.price}
+                        onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                        placeholder="مثال: 2500"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                        صيغة الملف الرقمي
+                      </label>
+                      <input
+                        type="text"
+                        value={newProduct.fileFormat}
+                        onChange={(e) => setNewProduct({ ...newProduct, fileFormat: e.target.value })}
+                        placeholder="مثال: PDF, ZIP, MP4, PSD"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                        رابط التحميل المباشر (Google Drive / Mega / Direct)
+                      </label>
+                      <input
+                        type="url"
+                        value={newProduct.downloadUrl}
+                        onChange={(e) => setNewProduct({ ...newProduct, downloadUrl: e.target.value })}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs sm:text-sm font-bold text-slate-300 block">
+                      وصف المنتج ومحتوياته بالتفصيل
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={newProduct.description}
+                      onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                      placeholder="اشرح للمشتري ماذا سيحصل عليه فور الدفع..."
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl p-4 text-sm text-white outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <PlusCircle className="w-5 h-5" />
+                    <span>نشر المنتج في سوق وان كليك الآن</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* إعدادات استقبال الدفع للبائع (BaridiMob & RedotPay) */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5">
+                  <div className="flex items-center gap-2.5 border-b border-slate-800 pb-4">
+                    <CreditCard className="w-6 h-6 text-amber-400" />
+                    <div>
+                      <h3 className="text-lg font-extrabold text-white">بيانات استقبال أرباحك</h3>
+                      <p className="text-xs text-slate-400">تظهر للمشترين عند شراء منتجاتك</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-300 block">
+                        اسم متجرك / اسم البائع الظاهر
+                      </label>
+                      <input
+                        type="text"
+                        value={sellerInfo.storeName}
+                        onChange={(e) => setSellerInfo({ ...sellerInfo, storeName: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                        <Smartphone className="w-4 h-4" />
+                        رقم حساب بريدي موب (RIP - 20 رقماً)
+                      </label>
+                      <input
+                        type="text"
+                        value={sellerInfo.rip}
+                        onChange={(e) => setSellerInfo({ ...sellerInfo, rip: e.target.value })}
+                        className="w-full bg-slate-950 border border-amber-500/30 rounded-xl px-4 py-2.5 text-sm font-mono text-amber-200 outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-rose-400 flex items-center gap-1.5">
+                        <CreditCard className="w-4 h-4" />
+                        معرف ريدوت باي (RedotPay UID)
+                      </label>
+                      <input
+                        type="text"
+                        value={sellerInfo.redotId}
+                        onChange={(e) => setSellerInfo({ ...sellerInfo, redotId: e.target.value })}
+                        className="w-full bg-slate-950 border border-rose-500/30 rounded-xl px-4 py-2.5 text-sm font-mono text-rose-200 outline-none focus:border-rose-400"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => showToast('تم حفظ إعدادات الدفع الخاصة بمتجرك بنجاح!')}
+                      className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition-colors cursor-pointer"
+                    >
+                      حفظ بيانات الدفع (بريدي موب & ريدوت باي)
+                    </button>
+                  </div>
+                </div>
+
+                {/* قائمة المنتجات التي أضافها البائع */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                  <h4 className="font-bold text-white text-base flex items-center justify-between">
+                    <span>منتجاتك المنشورة حديثاً</span>
+                    <span className="text-xs text-emerald-400">{mySellerProducts.length} منتج</span>
+                  </h4>
+
+                  {mySellerProducts.length === 0 ? (
+                    <p className="text-xs text-slate-400 py-4 text-center">
+                      لم تقم بإضافة منتجات جديدة في هذه الجلسة بعد. استخدم النموذج لنشر أول منتج!
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {mySellerProducts.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3"
+                        >
+                          <div>
+                            <p className="text-sm font-bold text-white line-clamp-1">{item.title}</p>
+                            <span className="text-xs text-emerald-400 font-bold">
+                              {item.price.toLocaleString('ar-DZ')} د.ج
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteProduct(item.id)}
+                            className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                            title="حذف المنتج"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= 3. تبويب مشترياتي وتحميل الملفات (MY PURCHASES) ================= */}
+        {activeTab === 'purchases' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black text-white">مكتبة مشترياتي الرقمية</h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  جميع المنتجات الرقمية التي قمت بشرائها متاحة للتحميل المباشر في أي وقت.
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveTab('marketplace')}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-xl transition-all cursor-pointer"
+              >
+                تصفح المزيد من المنتجات
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {purchasedItems.map((item, index) => (
+                <div
+                  key={`${item.id}-${index}`}
+                  className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between gap-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shrink-0`}>
+                      {renderProductIcon(item.iconType)}
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        مدفوع ومفعل ✓
+                      </span>
+                      <h3 className="text-base sm:text-lg font-extrabold text-white">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        البائع: {item.sellerName} • الصيغة: {item.fileFormat}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-3.5 text-xs grid grid-cols-2 gap-2 text-slate-300">
+                    <div>
+                      <span className="text-slate-500 block">وسيلة الدفع:</span>
+                      <strong className="text-amber-300">{item.paymentMethod}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block">مرجع العملية:</span>
+                      <strong className="font-mono text-emerald-400">{item.transactionRef}</strong>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => triggerDigitalDownload(item)}
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+                  >
+                    <Download className="w-5 h-5" />
+                    <span>تحميل المنتج الرقمي الآن ({item.fileSize})</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* ================= نافذة معاينة تفاصيل المنتج (Preview Modal) ================= */}
+      {previewProduct && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 relative shadow-2xl">
+            <button
+              onClick={() => setPreviewProduct(null)}
+              className="absolute left-5 top-5 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300">
+                {previewProduct.category}
+              </span>
+              <span className="text-xs text-amber-400 font-bold">
+                ★ {previewProduct.rating} ({previewProduct.sales} مبيعة)
+              </span>
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-black text-white">
+              {previewProduct.title}
+            </h3>
+
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {previewProduct.description}
+            </p>
+
+            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-slate-500 block">البائع:</span>
+                <strong className="text-white">{previewProduct.sellerName}</strong>
+              </div>
+              <div>
+                <span className="text-slate-500 block">صيغة وحجم الملف:</span>
+                <strong className="text-emerald-400">{previewProduct.fileFormat} ({previewProduct.fileSize})</strong>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <div>
+                <span className="text-xs text-slate-400 block">السعر</span>
+                <span className="text-2xl font-black text-emerald-400">
+                  {previewProduct.price.toLocaleString('ar-DZ')} د.ج
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  const prod = previewProduct;
+                  setPreviewProduct(null);
+                  openCheckout(prod);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-600/25 cursor-pointer"
+              >
+                شراء الآن عبر بريدي موب / ريدوت باي
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= نافذة الدفع التفاعلية (BaridiMob & RedotPay Checkout Modal) ================= */}
+      {checkoutProduct && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 relative shadow-2xl my-8">
+            {/* زر الإغلاق */}
+            <button
+              onClick={() => setCheckoutProduct(null)}
+              className="absolute left-5 top-5 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {!checkoutSuccess ? (
+              <>
+                {/* عنوان النافذة */}
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>بوابة الدفع الرقمي الآمن - وان كليك الجزائر</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white">إتمام شراء المنتج الرقمي</h3>
+                </div>
+
+                {/* ملخص المنتج المختار */}
+                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-white line-clamp-1">
+                      {checkoutProduct.title}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      البائع: {checkoutProduct.sellerName}
+                    </p>
+                  </div>
+                  <div className="text-left shrink-0">
+                    <span className="text-xl font-black text-emerald-400">
+                      {checkoutProduct.price.toLocaleString('ar-DZ')} د.ج
+                    </span>
+                    <span className="block text-[11px] text-slate-400">
+                      ≈ {convertDzdToUsdt(checkoutProduct.price)} USDT
+                    </span>
+                  </div>
+                </div>
+
+                {/* اختيار وسيلة الدفع: بريدي موب أو ريدوت باي */}
+                <div className="space-y-2.5">
+                  <label className="text-xs font-bold text-slate-300 block">
+                    اختر طريقة الدفع المفضلة لديك:
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('baridimob')}
+                      className={`p-4 rounded-2xl border text-right transition-all flex flex-col gap-1.5 cursor-pointer ${
+                        paymentMethod === 'baridimob'
+                          ? 'bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Smartphone className="w-5 h-5 text-amber-400" />
+                        {paymentMethod === 'baridimob' && (
+                          <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                        )}
+                      </div>
+                      <span className="font-black text-sm text-amber-300">بريدي موب (BaridiMob)</span>
+                      <span className="text-[11px] text-slate-400">تحويل RIP / CCP بالدينار</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('redotpay')}
+                      className={`p-4 rounded-2xl border text-right transition-all flex flex-col gap-1.5 cursor-pointer ${
+                        paymentMethod === 'redotpay'
+                          ? 'bg-rose-500/15 border-rose-400 text-white shadow-lg shadow-rose-500/10'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <CreditCard className="w-5 h-5 text-rose-400" />
+                        {paymentMethod === 'redotpay' && (
+                          <CheckCircle2 className="w-4 h-4 text-rose-400" />
+                        )}
+                      </div>
+                      <span className="font-black text-sm text-rose-300">ريدوت باي (RedotPay)</span>
+                      <span className="text-[11px] text-slate-400">تحويل فوري عبر RedotPay ID</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* تفاصيل التحويل حسب الوسيلة المختارة */}
+                {paymentMethod === 'baridimob' ? (
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-amber-200">
+                      <span className="font-bold">بيانات التحويل عبر تطبيق بريدي موب (RIP):</span>
+                      <span className="bg-amber-400/20 px-2 py-0.5 rounded text-[11px]">بريد الجزائر</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-[11px] text-slate-400 block">رقم RIP الخاص بالبائع:</span>
+                        <span className="font-mono text-sm sm:text-base font-bold text-amber-300 tracking-wide">
+                          {checkoutProduct.sellerRip}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(checkoutProduct.sellerRip, 'rip')}
+                        className="px-3 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedText === 'rip' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        <span>{copiedText === 'rip' ? 'تم النسخ' : 'نسخ RIP'}</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      المبلغ المطلوب تحويله: <strong className="text-amber-300">{checkoutProduct.price.toLocaleString('ar-DZ')} د.ج</strong>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-rose-200">
+                      <span className="font-bold">إرسال فوري عبر تطبيق RedotPay (Send via UID):</span>
+                      <span className="bg-rose-400/20 px-2 py-0.5 rounded text-[11px]">0% عمولة</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-[11px] text-slate-400 block">معرف RedotPay UID الخاص بالبائع:</span>
+                        <span className="font-mono text-base font-bold text-rose-300 tracking-wider">
+                          {checkoutProduct.sellerRedotId}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(checkoutProduct.sellerRedotId, 'redot')}
+                        className="px-3 py-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedText === 'redot' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        <span>{copiedText === 'redot' ? 'تم النسخ' : 'نسخ UID'}</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      المبلغ المطلوب: <strong className="text-rose-300">{convertDzdToUsdt(checkoutProduct.price)} USDT</strong> (ما يعادل {checkoutProduct.price.toLocaleString('ar-DZ')} د.ج)
+                    </p>
+                  </div>
+                )}
+
+                {/* نموذج تأكيد رقم الوصل وفتح التحميل */}
+                <form onSubmit={handleConfirmPayment} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">
+                      أدخل رقم عملية التحويل (رقم الوصل في بريدي موب أو RedotPay) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={transactionId}
+                      onChange={(e) => setTransactionId(e.target.value)}
+                      placeholder={
+                        paymentMethod === 'baridimob'
+                          ? 'مثال: 002489562314'
+                          : 'مثال: RP-99854123'
+                      }
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-slate-400 block mb-1">
+                        رقم الهاتف (اختياري لاستلام نسخة SMS)
+                      </label>
+                      <input
+                        type="tel"
+                        value={buyerPhone}
+                        onChange={(e) => setBuyerPhone(e.target.value)}
+                        placeholder="05 / 06 / 07 ..."
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-slate-400 block mb-1">
+                        إرفاق صورة الوصل (اختياري)
+                      </label>
+                      <label className="w-full bg-slate-950 border border-dashed border-slate-700 hover:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-300 flex items-center justify-center gap-2 cursor-pointer">
+                        <Upload className="w-4 h-4 text-emerald-400" />
+                        <span className="truncate">
+                          {receiptFileName || 'اختر صورة الوصل'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              setReceiptFileName(e.target.files[0].name);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {paymentError && (
+                    <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl">
+                      {paymentError}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>تأكيد الدفع وتحميل المنتج فوراً</span>
+                  </button>
+                </form>
+              </>
+            ) : (
+              /* شاشة نجاح الدفع والتحميل الفوري */
+              <div className="text-center py-6 space-y-5">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-white">
+                    تم تأكيد الدفع بنجاح! بارك الله فيك
+                  </h3>
+                  <p className="text-sm text-slate-300 max-w-md mx-auto">
+                    أصبح المنتج <strong className="text-emerald-400">"{checkoutProduct.title}"</strong> جاهزاً للتحميل الفوري، كما تمت إضافته إلى قسم "مشترياتي".
+                  </p>
+                </div>
+
+                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs space-y-1.5 text-slate-300 max-w-sm mx-auto">
+                  <div className="flex justify-between">
+                    <span>المبلغ المدفوع:</span>
+                    <strong className="text-emerald-400">{checkoutProduct.price.toLocaleString('ar-DZ')} د.ج</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>وسيلة الدفع:</span>
+                    <strong>{paymentMethod === 'baridimob' ? 'بريدي موب' : 'ريدوت باي'}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>رقم المرجع:</span>
+                    <strong className="font-mono">{transactionId.toUpperCase()}</strong>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    onClick={() => triggerDigitalDownload(checkoutProduct)}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 cursor-pointer"
+                  >
+                    <Download className="w-5 h-5" />
+                    <span>تحميل الملف الرقمي الآن</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCheckoutProduct(null);
+                      setActiveTab('purchases');
+                    }}
+                    className="px-6 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm cursor-pointer"
+                  >
+                    الذهاب إلى مشترياتي
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* الفوتر (Footer) */}
+      <footer className="border-t border-slate-800/80 bg-slate-950 mt-16 py-10 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs sm:text-sm text-slate-400">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black">
+              1C
+            </div>
+            <div>
+              <p className="font-bold text-white">منصة وان كليك الجزائر (OneClick DZ)</p>
+              <p className="text-xs text-slate-500">أول سوق جزائري مفتوح لبيع وشراء المنتجات الرقمية بالدينار الجزائري</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-amber-300 font-bold">
+              BaridiMob (RIP / CCP)
+            </span>
+            <span className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-rose-400 font-bold">
+              RedotPay (USDT / DZD)
+            </span>
+            <span className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-emerald-400 font-bold">
+              عملة العرض: د.ج (DZD)
+            </span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
